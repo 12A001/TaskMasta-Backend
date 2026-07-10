@@ -26,11 +26,6 @@ reward: {
   required: true
 },
 
-tier: {
-  type: String,
-  enum: ['low', 'medium', 'high'],
-  required: true
-},
 
     secretCode: {
       type: String,

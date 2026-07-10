@@ -8,11 +8,15 @@ export const initializePayment = async (req, res) => {
   try {
     const { plan } = req.body
 
-    const prices = {
-      normal: 2500, 
-      premium: 5000,
-      super: 10000
-    }
+const prices = {
+  starter: 10000,
+  bronze: 25000,
+  silver: 50000,
+  gold: 100000,
+  platinum: 150000,
+  diamond: 200000,
+  elite: 500000
+}
 
     const amount = prices[plan]
 

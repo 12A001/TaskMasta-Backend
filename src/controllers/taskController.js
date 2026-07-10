@@ -60,28 +60,31 @@ import { resetDailyProgress } from '../utils/resetDailyProgress.js'
 
 export const getTasks = async (req, res) => {
   try {
-    const userPlan = req.user?.plan || 'normal'
+const userPlan = req.user?.plan || 'free'
 
-    let allowedTiers = []
+const rewardLimits = {
+  free: 0,
+  starter: 50,
+  bronze: 100,
+  silver: 150,
+  gold: 200,
+  platinum: 250,
+  diamond: 300,
+  elite: 500
+}
 
-    if (userPlan === 'normal') {
-      allowedTiers = ['low']
-    } else if (userPlan === 'premium') {
-      allowedTiers = ['low', 'medium']
-    } else if (userPlan === 'super') {
-      allowedTiers = ['low', 'medium', 'high']
-    }
+const maxReward = rewardLimits[userPlan] || 0
 
     const completedTaskIds = await TaskProgress.find({
       userId: req.user._id,
       rewardClaimed: true
     }).distinct('taskId')
 
-    const tasks = await Task.find({
-      _id: { $nin: completedTaskIds },
-      active: true,
-      tier: { $in: allowedTiers }
-    })
+const tasks = await Task.find({
+  _id: { $nin: completedTaskIds },
+  active: true,
+  reward: { $lte: maxReward }
+})
 
     const today = new Date().toDateString()
 
