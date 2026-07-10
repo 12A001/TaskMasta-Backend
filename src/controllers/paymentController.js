@@ -8,15 +8,15 @@ export const initializePayment = async (req, res) => {
   try {
     const { plan } = req.body
 
-const prices = {
-  starter: 10000,
-  bronze: 25000,
-  silver: 50000,
-  gold: 100000,
-  platinum: 150000,
-  diamond: 200000,
-  elite: 500000
-}
+    const prices = {
+      starter: 10000,
+      bronze: 25000,
+      silver: 50000,
+      gold: 100000,
+      platinum: 150000,
+      diamond: 200000,
+      elite: 500000
+    }
 
     const amount = prices[plan]
 
@@ -26,6 +26,34 @@ const prices = {
       })
     }
 
+    const frontendUrl = process.env.FRONTEND_URL
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+
+      line_items: [
+        {
+          price_data: {
+            currency: 'ngn',
+            product_data: {
+              name: `${plan.toUpperCase()} Plan`
+            },
+            unit_amount: amount * 100
+          },
+          quantity: 1
+        }
+      ],
+
+      success_url: `${frontendUrl}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+
+      cancel_url: `${frontendUrl}/upgrade`,
+
+      metadata: {
+        userId: req.user._id.toString(),
+        plan
+      }
+    })
 
     return res.json({
       success: true,
